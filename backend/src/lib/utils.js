@@ -1,6 +1,10 @@
 import jwt from "jsonwebtoken";
 
 export const generateToken = (userId, res) => {
+    const {JWT_SECRET} = process.env;
+    if (!JWT_SECRET) {
+        throw new Error("JWT_SECRET is not defined in environment variables");
+    }
     const token = jwt.sign({userId}, process.env.JWT_SECRET, {expiresIn: "30d"});
     //jwt.sign() is a method provided by the jsonwebtoken library that is used to create a JSON Web Token (JWT).
     //The first argument is the payload, which is an object that contains the data you want to include in the token. In this case, we are including the userId.
