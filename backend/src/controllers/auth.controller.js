@@ -1,6 +1,8 @@
 import { generateToken } from "../lib/utils.js";
 import User from "../models/Users.js";
 import bcrypt from "bcryptjs";
+import { sendWelcomeEmail } from "../emails/emailHandlers.js";
+import { ENV } from "../lib/env.js";
 
 export const signup = async (req, res) => {
     const {fullName, email, password} = req.body;
@@ -44,22 +46,30 @@ export const signup = async (req, res) => {
             email,
             password: hashedPassword
         })
-        if (newUser)
+    if (newUser)
+    {
+        const savedUser = await newUser.save();
+        generateToken(savedUser._id, res)
+        res.status(201).json({
+            _id: newUser._id,
+            fullName: newUser.fullName,
+            email: newUser.email,
+            profilePic: newUser.profilePic
+        });
+        //201 means created successfully   200 means success
+        try
         {
-            const savedUser = await newUser.save();
-            generateToken(savedUser._id, res)
-            res.status(201).json({
-                _id: newUser._id,
-                fullName: newUser.fullName,
-                email: newUser.email,
-                profilePic: newUser.profilePic
-            });
-            //201 means created successfully   200 means success
+            await sendWelcomeEmail(email, fullName, ENV.CLIENT_URL);
+        } 
+        catch(error)
+        {
+            console.error("Error sending welcome email: ", error);
         }
-        else
-            {
-            res.status(400).json({message: "Invalid user data"});
-        }
+    }
+    else
+    {
+        res.status(400).json({message: "Invalid user data"});
+    }
     } catch (error) {
         console.error("Error in signup controller: ", error);
         res.status(500).json({message: "Server error"});
