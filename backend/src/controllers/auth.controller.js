@@ -76,3 +76,51 @@ export const signup = async (req, res) => {
 
     }
 }
+export const login = async (req, res) => {
+    const {email, password} = req.body;
+    if (!email || !password)
+    {
+        return res.status(400).json({message: "Please fill all fields"});
+    }
+    try{
+        const user = await User.findOne({email});
+        if (!user)
+        {
+            return res.status(400).json({message: "Invalid credentials"});
+        }
+        const isPasswordCorrect = await bcrypt.compare(password, user.password);
+        //bcrypt.compare() is a method provided by the bcrypt library that is 
+        // used to compare a plaintext password with a hashed password. 
+        //It takes two arguments: the first is the plaintext password that the 
+        // user is trying to log in with, and the second is the hashed password that is stored 
+        // in the database for that user.
+        if (!isPasswordCorrect)
+        {
+            return res.status(400).json({message: "Invalid credentials"});
+        }
+        generateToken(user._id, res);
+        res.status(200).json({
+            _id: user._id,
+            fullName: user.fullName,
+            email: user.email,
+            profilePic: user.profilePic
+        });
+    } catch(error)
+    {
+        console.error("Error in login controller: ", error);
+        res.status(500).json({message: "Server error"});
+    }
+};
+export const logout = (req, res) => {
+    //we don't use request here because we are not doing anything with the request, 
+    // we are just clearing the cookie that contains the JWT token.
+    //What does request even do? 
+    //The request object in Express.js contains information about the HTTP request that was 
+    // made to the server, such as the request headers, query parameters, and body data.
+    //In the logout function, we don't need to access any of this information 
+    // because we are simply clearing the cookie that contains the JWT token.
+    res.cookie("jwt", "", {maxAge:0});
+    //matches what's in utils.js, we set the cookie name to "jwt" and here we are 
+    // clearing it by calling res.cookies("jwt") without providing a value or options.
+    res.status(200).json({message: "Logged out successfully"});
+};
