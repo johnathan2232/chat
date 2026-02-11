@@ -8,7 +8,10 @@ export const ENV =
     RESEND_API_KEY: process.env.RESEND_API_KEY,
     JWT_SECRET: process.env.JWT_SECRET,
     EMAIL_FROM: process.env.EMAIL_FROM,
-    EMAIL_FROM_NAME: process.env.EMAIL_FROM_NAME
+    EMAIL_FROM_NAME: process.env.EMAIL_FROM_NAME,
+    CLOUDINARY_CLOUD_NAME: process.env.CLOUDINARY_CLOUD_NAME,
+    CLOUDINARY_API_KEY: process.env.CLOUDINARY_API_KEY,
+    CLOUDINARY_API_SECRET: process.env.CLOUDINARY_API_SECRET    
 };
 //PORT=3000
 //MONGO_URI=mongodb+srv://johnathanabraham0_db_user:7EDHY1stJh6GTRQD@cluster0.xxb4d3s.mongodb.net/chat_db?appName=Cluster0
